@@ -33,6 +33,9 @@ public class InterviewServiceImpl implements InterviewService {
     @Override
     public Interview createInterviewSlot(InterviewRequest request) {
         logger.info("starting createInterviewSlot inside InterviewServiceImpl to create of interview slot:");
+        if (!interviewRepository.findAllByInterviewTime(request.getInterviewTime()).isEmpty()) {
+            throw new APIException("Can not book a slot at the same date and time");
+        }
         return interviewRepository.save(new Interview(request.getApplicantName(), request.getApplicantEmail(), request.getInterviewTime()));
     }
 
