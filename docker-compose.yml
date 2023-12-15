@@ -1,0 +1,11 @@
+version: '3'
+services:
+  interview-app-container:
+    image: interview-app:1
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - /data/interview-app
+    ports:
+      - "8869:8862"

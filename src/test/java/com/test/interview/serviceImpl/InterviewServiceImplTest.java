@@ -19,7 +19,7 @@ class InterviewServiceImplTest {
     @BeforeEach
     void setUp() {
         //there is some error need to fix
-        //interviewService = new InterviewServiceImpl(interviewRepository);
+        interviewService = new InterviewServiceImpl(interviewRepository);
     }
 
     @AfterEach

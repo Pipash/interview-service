@@ -5,6 +5,7 @@ import com.test.interview.model.Interview;
 import com.test.interview.payload.InterviewRequest;
 import com.test.interview.repository.InterviewRepository;
 import com.test.interview.service.InterviewService;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class InterviewServiceImpl implements InterviewService {
     private final static Logger logger = LoggerFactory.getLogger(InterviewServiceImpl.class);
 
-    @Autowired
-    private InterviewRepository interviewRepository;
+    private final InterviewRepository interviewRepository;
 
     @Override
     public List<Interview> getAllSlot() {
