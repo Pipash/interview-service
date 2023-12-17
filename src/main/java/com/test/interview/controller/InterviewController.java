@@ -46,7 +46,7 @@ public class InterviewController {
     @GetMapping("/view-booking/{id}")
     public ResponseEntity<ServiceResponse> getSlot(@PathVariable Integer id) {
         logger.info("start of getSlot inside controller InterviewController:");
-        Optional<Interview> interview = interviewService.getSingleSlot(id);
+        Interview interview = interviewService.getSingleSlot(id);
         return new ResponseEntity<>(new ServiceResponse("single data", interview), HttpStatus.OK);
     }
 

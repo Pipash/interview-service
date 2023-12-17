@@ -8,15 +8,11 @@ import com.test.interview.service.InterviewService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +20,8 @@ public class InterviewServiceImpl implements InterviewService {
     private final static Logger logger = LoggerFactory.getLogger(InterviewServiceImpl.class);
 
     private final InterviewRepository interviewRepository;
+
+    private final RedisTemplate<String, Interview> redisTemplate;
 
     @Override
     public List<Interview> getAllSlot() {
@@ -41,13 +39,31 @@ public class InterviewServiceImpl implements InterviewService {
     }
 
     @Override
-    public Optional<Interview> getSingleSlot(Integer id) {
+    public Interview getSingleSlot(Integer id) {
         logger.info("starting getSingleSlot inside InterviewServiceImpl to get single interview slot:");
-        return interviewRepository.findById(id);
+        String key = "slot_"+id;
+        final ValueOperations<String, Interview> ops = redisTemplate.opsForValue();
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            logger.info("data fetched from redis cache");
+            return ops.get(key);
+        }
+
+        logger.info("fetching data from database");
+        final Interview interview = interviewRepository.findById(id).orElseThrow(()-> new APIException("data not found"));
+
+        ops.set(key, interview);
+        logger.info("data added to redis");
+
+        return interview;
     }
 
     @Override
     public Interview updateInterviewSlot(Integer id, InterviewRequest request) {
+        final String key = "slot_"+id;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            redisTemplate.delete(key);
+            logger.info("redis data removed due to update");
+        }
         logger.info("starting updateInterviewSlot inside InterviewServiceImpl to update single interview slot:");
         return interviewRepository.findById(id).map(interview -> {
             interview.setApplicantName(request.getApplicantName());
@@ -59,6 +75,12 @@ public class InterviewServiceImpl implements InterviewService {
 
     @Override
     public void deleteInterviewSlot(Integer id) {
+        final String key = "slot_"+id;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+            redisTemplate.delete(key);
+            logger.info("redis data removed due to deletion");
+        }
+
         logger.info("starting deleteInterviewSlot inside InterviewServiceImpl to delete single interview slot:");
         if (interviewRepository.findById(id).isEmpty()) {
             throw new APIException("data not found with given id");

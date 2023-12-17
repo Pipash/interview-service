@@ -1,5 +1,13 @@
 version: '3'
 services:
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - cache:/data
   interview-app-container:
     image: interview-app:1
     build:
@@ -9,3 +17,5 @@ services:
       - /data/interview-app
     ports:
       - "8869:8862"
+    depends_on:
+      - cache

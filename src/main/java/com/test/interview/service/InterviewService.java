@@ -13,7 +13,7 @@ public interface InterviewService {
 
     public Interview createInterviewSlot(InterviewRequest request);
 
-    public Optional<Interview> getSingleSlot(Integer id);
+    public Interview getSingleSlot(Integer id);
 
     public Interview updateInterviewSlot(Integer id, InterviewRequest request);
 

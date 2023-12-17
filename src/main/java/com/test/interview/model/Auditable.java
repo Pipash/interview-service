@@ -1,5 +1,10 @@
 package com.test.interview.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -18,10 +23,15 @@ import java.time.LocalDateTime;
 public class Auditable {
     @CreatedDate
     @CreationTimestamp
-    @Column(updatable = false)
+    @Column(name = "created_at" ,updatable = false)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     protected LocalDateTime createdOn;
 
+    @Column(name = "modified_at")
     @LastModifiedDate
     @UpdateTimestamp
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     protected LocalDateTime updatedOn;
 }
